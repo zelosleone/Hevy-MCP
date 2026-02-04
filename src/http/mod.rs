@@ -14,7 +14,7 @@ pub async fn serve(router: HevyRouter, addr: SocketAddr) -> Result<(), HttpError
     };
 
     let app = Router::new()
-        .route("/mcp", post(stream::mcp_stream))
+        .route("/hevymcp", post(stream::mcp_stream))
         .with_state(state);
 
     let listener = tokio::net::TcpListener::bind(addr)
