@@ -2,6 +2,7 @@ use std::future::Future;
 use std::pin::Pin;
 use std::sync::Arc;
 
+use dashmap::DashMap;
 use mcp_server::router::{CapabilitiesBuilder, Router};
 use mcp_spec::handler::{PromptError, ResourceError, ToolError};
 use mcp_spec::prompt::Prompt;
@@ -21,18 +22,42 @@ use crate::router::tools::list_tools;
 
 #[derive(Clone)]
 pub struct HevyRouter {
-    client: Arc<HevyClient>,
+    client_cache: Arc<DashMap<String, Arc<HevyClient>>>,
+    pub default_api_key: Option<String>,
 }
 
 impl HevyRouter {
-    pub fn new(api_key: impl Into<String>) -> Self {
+    pub fn new(default_api_key: Option<String>) -> Self {
         Self {
-            client: Arc::new(HevyClient::new(api_key)),
+            client_cache: Arc::new(DashMap::new()),
+            default_api_key,
+        }
+    }
+
+    pub fn get_or_create_client(&self, api_key: &str) -> Arc<HevyClient> {
+        self.client_cache
+            .entry(api_key.to_string())
+            .or_insert_with(|| Arc::new(HevyClient::new(api_key)))
+            .clone()
+    }
+}
+
+#[derive(Clone)]
+pub(crate) struct RequestRouter {
+    hevy_router: Arc<HevyRouter>,
+    api_key: String,
+}
+
+impl RequestRouter {
+    pub(crate) fn new(hevy_router: Arc<HevyRouter>, api_key: String) -> Self {
+        Self {
+            hevy_router,
+            api_key,
         }
     }
 }
 
-impl Router for HevyRouter {
+impl Router for RequestRouter {
     fn name(&self) -> String {
         "hevy-mcp-server".to_string()
     }
@@ -57,7 +82,8 @@ impl Router for HevyRouter {
         tool_name: &str,
         arguments: Value,
     ) -> Pin<Box<dyn Future<Output = Result<Vec<Content>, ToolError>> + Send + 'static>> {
-        call_tool(self.client.clone(), tool_name, arguments)
+        let client = self.hevy_router.get_or_create_client(&self.api_key);
+        call_tool(client, tool_name, arguments)
     }
 
     fn list_resources(&self) -> Vec<Resource> {

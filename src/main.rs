@@ -15,14 +15,19 @@ async fn main() -> Result<(), AppError> {
         .init();
 
     let api_key = match env::var("HEVY_API_KEY") {
-        Ok(value) => value,
-        Err(env::VarError::NotPresent) => return Err(AppError::MissingApiKey),
+        Ok(value) => Some(value),
+        Err(env::VarError::NotPresent) => None,
         Err(env::VarError::NotUnicode(_)) => {
             return Err(AppError::EnvVar(
                 "HEVY_API_KEY must be valid UTF-8".to_string(),
             ));
         }
     };
+
+    match &api_key {
+        Some(_) => tracing::info!("Running in single-user mode with default API key"),
+        None => tracing::info!("Running in multi-user mode - API key required per request"),
+    }
 
     let router = HevyRouter::new(api_key);
     let addr = match env::var("HEVY_HTTP_ADDR") {
@@ -44,10 +49,6 @@ async fn main() -> Result<(), AppError> {
 
 #[derive(Error, Debug)]
 enum AppError {
-    #[error(
-        "HEVY_API_KEY environment variable must be set. Get your API key from https://hevy.com/settings?developer"
-    )]
-    MissingApiKey,
     #[error("{0}")]
     EnvVar(String),
     #[error("HEVY_HTTP_ADDR must be a valid socket address: {0}")]

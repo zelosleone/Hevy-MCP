@@ -1,6 +1,7 @@
 use crate::HevyRouter;
+use crate::router::RequestRouter;
 use axum::body::Body;
-use axum::extract::State;
+use axum::extract::{Query, State};
 use axum::http::header;
 use axum::response::{IntoResponse, Response};
 use bytes::Bytes;
@@ -10,6 +11,7 @@ use mcp_spec::protocol::{
     ErrorData, INTERNAL_ERROR, INVALID_REQUEST, JsonRpcError, JsonRpcMessage, JsonRpcRequest,
     JsonRpcResponse, PARSE_ERROR,
 };
+use serde::Deserialize;
 use std::{io, sync::Arc};
 use thiserror::Error;
 use tokio::sync::mpsc;
@@ -23,9 +25,33 @@ use tower_service::Service;
 pub(crate) struct AppState {
     pub(crate) router: Arc<HevyRouter>,
 }
-pub(crate) async fn mcp_stream(State(state): State<AppState>, body: Body) -> Response {
+
+#[derive(Deserialize)]
+pub(crate) struct McpQuery {
+    apikey: Option<String>,
+}
+
+pub(crate) async fn mcp_stream(
+    State(state): State<AppState>,
+    Query(query): Query<McpQuery>,
+    body: Body,
+) -> Response {
     let (tx, rx) = mpsc::channel::<Result<Bytes, io::Error>>(32);
     let router = state.router.clone();
+
+    let api_key = match query.apikey.or_else(|| state.router.default_api_key.clone()) {
+        Some(key) => key,
+        None => {
+            let error = error_message(ErrorData {
+                code: INVALID_REQUEST,
+                message: "API key required. Provide via ?apikey=xxx query parameter or HEVY_API_KEY environment variable".to_string(),
+                data: None,
+            });
+            let json = serde_json::to_string(&error).unwrap_or_default();
+            let body = Body::from(format!("{json}\n"));
+            return ([(header::CONTENT_TYPE, "application/jsonl")], body).into_response();
+        }
+    };
 
     tokio::spawn(async move {
         let stream = body
@@ -38,7 +64,8 @@ pub(crate) async fn mcp_stream(State(state): State<AppState>, body: Body) -> Res
         let _ = lines
             .filter_map(move |line: Result<String, LinesCodecError>| {
                 let router = router.clone();
-                async move { handle_line_result(router, line).await }
+                let api_key = api_key.clone();
+                async move { handle_line_result(router, api_key, line).await }
             })
             .for_each_concurrent(Some(MAX_INFLIGHT), |message| async {
                 let _ = send_message(&tx, message).await;
@@ -61,11 +88,12 @@ async fn send_message(
 
 async fn handle_message(
     router: Arc<HevyRouter>,
+    api_key: String,
     message: JsonRpcMessage,
 ) -> Option<JsonRpcMessage> {
     match message {
         JsonRpcMessage::Request(request) => {
-            let response = call_service(router, request).await;
+            let response = call_service(router, api_key, request).await;
             Some(JsonRpcMessage::Response(response))
         }
         JsonRpcMessage::Response(_)
@@ -75,37 +103,50 @@ async fn handle_message(
     }
 }
 
-async fn call_service(router: Arc<HevyRouter>, request: JsonRpcRequest) -> JsonRpcResponse {
+async fn call_service(
+    router: Arc<HevyRouter>,
+    api_key: String,
+    request: JsonRpcRequest,
+) -> JsonRpcResponse {
     let id = request.id;
-    let mut service = RouterService((*router).clone());
+    let request_router = RequestRouter::new(router, api_key);
+    let mut service = RouterService(request_router);
 
     match service.call(request).await {
         Ok(response) => response,
-        Err(err) => JsonRpcResponse {
-            jsonrpc: "2.0".to_string(),
-            id,
-            result: None,
-            error: Some(ErrorData {
-                code: INTERNAL_ERROR,
-                message: err.to_string(),
-                data: None,
-            }),
-        },
+        Err(err) => {
+            let error_message = format!("{:?}", err);
+            JsonRpcResponse {
+                jsonrpc: "2.0".to_string(),
+                id,
+                result: None,
+                error: Some(ErrorData {
+                    code: INTERNAL_ERROR,
+                    message: error_message,
+                    data: None,
+                }),
+            }
+        }
     }
 }
 
-async fn process_line(router: Arc<HevyRouter>, line: String) -> Option<JsonRpcMessage> {
+async fn process_line(
+    router: Arc<HevyRouter>,
+    api_key: String,
+    line: String,
+) -> Option<JsonRpcMessage> {
     let message = match parse_message(&line) {
         Ok(Some(message)) => message,
         Ok(None) => return None,
         Err(error) => return Some(error_message(error)),
     };
 
-    handle_message(router, message).await
+    handle_message(router, api_key, message).await
 }
 
 async fn handle_line_result(
     router: Arc<HevyRouter>,
+    api_key: String,
     line: Result<String, LinesCodecError>,
 ) -> Option<JsonRpcMessage> {
     let line = match line {
@@ -119,7 +160,7 @@ async fn handle_line_result(
         }
     };
 
-    process_line(router, line).await
+    process_line(router, api_key, line).await
 }
 
 fn parse_message(line: &str) -> Result<Option<JsonRpcMessage>, ErrorData> {

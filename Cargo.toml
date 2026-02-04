@@ -25,6 +25,7 @@ tokio-stream = "0.1"
 tokio-util = { version = "0.7", features = ["codec"] }
 tower-service = "0.3"
 futures-util = "0.3"
+dashmap = "6"
 
 [profile.release]
 lto = true
