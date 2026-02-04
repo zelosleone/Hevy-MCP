@@ -53,7 +53,35 @@ pub(crate) fn tools() -> Vec<Tool> {
                     "start_time": {"type": "string", "description": "Start time in ISO 8601 format"},
                     "description": {"type": "string", "description": "Optional description"},
                     "end_time": {"type": "string", "description": "End time in ISO 8601 format"},
-                    "exercises": {"type": "array", "description": "Exercises in the workout"}
+                    "exercises": {
+                        "type": "array",
+                        "description": "Exercises in the workout",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "exercise_template_id": {"type": "string", "description": "Exercise template ID"},
+                                "superset_id": {"type": "number", "description": "Superset group ID"},
+                                "notes": {"type": "string", "description": "Exercise notes"},
+                                "sets": {
+                                    "type": "array",
+                                    "description": "Sets in the exercise",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "set_type": {"type": "string", "enum": ["Normal", "Warmup", "Dropset", "Failure"], "description": "Type of set"},
+                                            "weight_kg": {"type": "number", "description": "Weight in kg"},
+                                            "reps": {"type": "number", "description": "Number of reps"},
+                                            "duration_seconds": {"type": "number", "description": "Duration in seconds"},
+                                            "distance_meters": {"type": "number", "description": "Distance in meters"},
+                                            "rpe": {"type": "number", "description": "Rate of perceived exertion (1-10)"},
+                                            "custom_metric": {"type": "number", "description": "Custom metric value"}
+                                        }
+                                    }
+                                }
+                            },
+                            "required": ["exercise_template_id"]
+                        }
+                    }
                 },
                 "required": ["title", "start_time"]
             }),
@@ -70,7 +98,35 @@ pub(crate) fn tools() -> Vec<Tool> {
                     "start_time": {"type": "string", "description": "Start time in ISO 8601 format"},
                     "description": {"type": "string", "description": "Optional description"},
                     "end_time": {"type": "string", "description": "End time in ISO 8601 format"},
-                    "exercises": {"type": "array", "description": "Exercises in the workout"}
+                    "exercises": {
+                        "type": "array",
+                        "description": "Exercises in the workout",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "exercise_template_id": {"type": "string", "description": "Exercise template ID"},
+                                "superset_id": {"type": "number", "description": "Superset group ID"},
+                                "notes": {"type": "string", "description": "Exercise notes"},
+                                "sets": {
+                                    "type": "array",
+                                    "description": "Sets in the exercise",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "set_type": {"type": "string", "enum": ["Normal", "Warmup", "Dropset", "Failure"], "description": "Type of set"},
+                                            "weight_kg": {"type": "number", "description": "Weight in kg"},
+                                            "reps": {"type": "number", "description": "Number of reps"},
+                                            "duration_seconds": {"type": "number", "description": "Duration in seconds"},
+                                            "distance_meters": {"type": "number", "description": "Distance in meters"},
+                                            "rpe": {"type": "number", "description": "Rate of perceived exertion (1-10)"},
+                                            "custom_metric": {"type": "number", "description": "Custom metric value"}
+                                        }
+                                    }
+                                }
+                            },
+                            "required": ["exercise_template_id"]
+                        }
+                    }
                 },
                 "required": ["id", "title", "start_time"]
             }),

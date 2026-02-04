@@ -34,7 +34,43 @@ pub(crate) fn tools() -> Vec<Tool> {
                     "title": {"type": "string", "description": "Routine title"},
                     "folder_id": {"type": "string", "description": "Folder ID to place the routine in"},
                     "notes": {"type": "string", "description": "Optional notes"},
-                    "exercises": {"type": "array", "description": "Exercises in the routine"}
+                    "exercises": {
+                        "type": "array",
+                        "description": "Exercises in the routine",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "exercise_template_id": {"type": "string", "description": "Exercise template ID"},
+                                "superset_id": {"type": "number", "description": "Superset group ID"},
+                                "rest_seconds": {"type": "number", "description": "Rest time between sets in seconds"},
+                                "notes": {"type": "string", "description": "Exercise notes"},
+                                "sets": {
+                                    "type": "array",
+                                    "description": "Set templates in the exercise",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "set_type": {"type": "string", "enum": ["Normal", "Warmup", "Dropset", "Failure"], "description": "Type of set"},
+                                            "weight_kg": {"type": "number", "description": "Weight in kg"},
+                                            "reps": {"type": "number", "description": "Number of reps"},
+                                            "rep_range": {
+                                                "type": "object",
+                                                "description": "Rep range for the set",
+                                                "properties": {
+                                                    "start": {"type": "number", "description": "Min reps"},
+                                                    "end": {"type": "number", "description": "Max reps"}
+                                                }
+                                            },
+                                            "duration_seconds": {"type": "number", "description": "Duration in seconds"},
+                                            "distance_meters": {"type": "number", "description": "Distance in meters"},
+                                            "custom_metric": {"type": "number", "description": "Custom metric value"}
+                                        }
+                                    }
+                                }
+                            },
+                            "required": ["exercise_template_id"]
+                        }
+                    }
                 },
                 "required": ["title"]
             }),
@@ -48,7 +84,43 @@ pub(crate) fn tools() -> Vec<Tool> {
                     "id": {"type": "string", "description": "The routine ID to update"},
                     "title": {"type": "string", "description": "Routine title"},
                     "notes": {"type": "string", "description": "Optional notes"},
-                    "exercises": {"type": "array", "description": "Exercises in the routine"}
+                    "exercises": {
+                        "type": "array",
+                        "description": "Exercises in the routine",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "exercise_template_id": {"type": "string", "description": "Exercise template ID"},
+                                "superset_id": {"type": "number", "description": "Superset group ID"},
+                                "rest_seconds": {"type": "number", "description": "Rest time between sets in seconds"},
+                                "notes": {"type": "string", "description": "Exercise notes"},
+                                "sets": {
+                                    "type": "array",
+                                    "description": "Set templates in the exercise",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "set_type": {"type": "string", "enum": ["Normal", "Warmup", "Dropset", "Failure"], "description": "Type of set"},
+                                            "weight_kg": {"type": "number", "description": "Weight in kg"},
+                                            "reps": {"type": "number", "description": "Number of reps"},
+                                            "rep_range": {
+                                                "type": "object",
+                                                "description": "Rep range for the set",
+                                                "properties": {
+                                                    "start": {"type": "number", "description": "Min reps"},
+                                                    "end": {"type": "number", "description": "Max reps"}
+                                                }
+                                            },
+                                            "duration_seconds": {"type": "number", "description": "Duration in seconds"},
+                                            "distance_meters": {"type": "number", "description": "Distance in meters"},
+                                            "custom_metric": {"type": "number", "description": "Custom metric value"}
+                                        }
+                                    }
+                                }
+                            },
+                            "required": ["exercise_template_id"]
+                        }
+                    }
                 },
                 "required": ["id", "title"]
             }),

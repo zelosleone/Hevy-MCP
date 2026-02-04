@@ -39,7 +39,10 @@ pub(crate) async fn mcp_stream(
     let (tx, rx) = mpsc::channel::<Result<Bytes, io::Error>>(32);
     let router = state.router.clone();
 
-    let api_key = match query.apikey.or_else(|| state.router.default_api_key.clone()) {
+    let api_key = match query
+        .apikey
+        .or_else(|| state.router.default_api_key.clone())
+    {
         Some(key) => key,
         None => {
             let error = error_message(ErrorData {
