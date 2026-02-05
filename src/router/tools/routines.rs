@@ -32,7 +32,7 @@ pub(crate) fn tools() -> Vec<Tool> {
                 "type": "object",
                 "properties": {
                     "title": {"type": "string", "description": "Routine title"},
-                    "folder_id": {"type": "string", "description": "Folder ID to place the routine in"},
+                    "folder_id": {"type": "string", "description": "Folder ID to place the routine in (use get_routine_folders to list available folders)"},
                     "notes": {"type": "string", "description": "Optional notes"},
                     "exercises": {
                         "type": "array",
@@ -72,7 +72,7 @@ pub(crate) fn tools() -> Vec<Tool> {
                         }
                     }
                 },
-                "required": ["title"]
+                "required": ["title", "folder_id"]
             }),
         ),
         Tool::new(
