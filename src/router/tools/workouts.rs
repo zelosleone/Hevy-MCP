@@ -44,15 +44,15 @@ pub(crate) fn tools() -> Vec<Tool> {
         ),
         Tool::new(
             "create_workout",
-            "Create a new workout in Hevy. Requires title, start_time (ISO 8601), and exercises with sets.",
+            "Create a new workout in Hevy. Requires title, start_time, end_time (ISO 8601), and exercises with sets.",
             json!({
                 "type": "object",
                 "properties": {
                     "title": {"type": "string", "description": "Workout title"},
                     "is_private": {"type": "boolean", "description": "Whether the workout is private"},
                     "start_time": {"type": "string", "description": "Start time in ISO 8601 format"},
-                    "description": {"type": "string", "description": "Optional description"},
                     "end_time": {"type": "string", "description": "End time in ISO 8601 format"},
+                    "description": {"type": "string", "description": "Optional description"},
                     "exercises": {
                         "type": "array",
                         "description": "Exercises in the workout",
@@ -75,7 +75,8 @@ pub(crate) fn tools() -> Vec<Tool> {
                                             "distance_meters": {"type": "number", "description": "Distance in meters"},
                                             "rpe": {"type": "number", "description": "Rate of perceived exertion (1-10)"},
                                             "custom_metric": {"type": "number", "description": "Custom metric value"}
-                                        }
+                                        },
+                                        "required": ["set_type"]
                                     }
                                 }
                             },
@@ -83,7 +84,7 @@ pub(crate) fn tools() -> Vec<Tool> {
                         }
                     }
                 },
-                "required": ["title", "start_time"]
+                "required": ["title", "start_time", "end_time"]
             }),
         ),
         Tool::new(
@@ -96,8 +97,8 @@ pub(crate) fn tools() -> Vec<Tool> {
                     "title": {"type": "string", "description": "Workout title"},
                     "is_private": {"type": "boolean", "description": "Whether the workout is private"},
                     "start_time": {"type": "string", "description": "Start time in ISO 8601 format"},
-                    "description": {"type": "string", "description": "Optional description"},
                     "end_time": {"type": "string", "description": "End time in ISO 8601 format"},
+                    "description": {"type": "string", "description": "Optional description"},
                     "exercises": {
                         "type": "array",
                         "description": "Exercises in the workout",
@@ -120,7 +121,8 @@ pub(crate) fn tools() -> Vec<Tool> {
                                             "distance_meters": {"type": "number", "description": "Distance in meters"},
                                             "rpe": {"type": "number", "description": "Rate of perceived exertion (1-10)"},
                                             "custom_metric": {"type": "number", "description": "Custom metric value"}
-                                        }
+                                        },
+                                        "required": ["set_type"]
                                     }
                                 }
                             },
@@ -128,7 +130,7 @@ pub(crate) fn tools() -> Vec<Tool> {
                         }
                     }
                 },
-                "required": ["id", "title", "start_time"]
+                "required": ["id", "title", "start_time", "end_time"]
             }),
         ),
     ]

@@ -64,7 +64,8 @@ pub(crate) fn tools() -> Vec<Tool> {
                                             "duration_seconds": {"type": "number", "description": "Duration in seconds"},
                                             "distance_meters": {"type": "number", "description": "Distance in meters"},
                                             "custom_metric": {"type": "number", "description": "Custom metric value"}
-                                        }
+                                        },
+                                        "required": ["set_type"]
                                     }
                                 }
                             },
@@ -114,7 +115,8 @@ pub(crate) fn tools() -> Vec<Tool> {
                                             "duration_seconds": {"type": "number", "description": "Duration in seconds"},
                                             "distance_meters": {"type": "number", "description": "Distance in meters"},
                                             "custom_metric": {"type": "number", "description": "Custom metric value"}
-                                        }
+                                        },
+                                        "required": ["set_type"]
                                     }
                                 }
                             },
