@@ -32,15 +32,27 @@ pub(crate) fn tools() -> Vec<Tool> {
                 "type": "object",
                 "properties": {
                     "title": {"type": "string", "description": "Exercise title"},
-                    "exercise_type": {"type": "string", "description": "Exercise type, for example weight_reps"},
-                    "equipment_category": {"type": "string", "description": "Equipment category, for example barbell"},
-                    "muscle_group": {"type": "string", "description": "Primary muscle group, for example chest"},
+                    "exercise_type": {
+                        "type": "string",
+                        "enum": ["weight_reps", "reps", "duration", "weight_duration", "distance_duration", "weight"],
+                        "description": "Exercise type"
+                    },
+                    "equipment_category": {
+                        "type": "string",
+                        "enum": ["barbell", "dumbbell", "machine", "cable", "bodyweight", "band", "kettlebell", "trap_bar", "smith_machine", "other"],
+                        "description": "Equipment category"
+                    },
+                    "muscle_group": {
+                        "type": "string",
+                        "enum": ["abdominals", "abductors", "adductors", "biceps", "calves", "cardio", "chest", "forearms", "full_body", "glutes", "hamstrings", "lats", "lower_back", "neck", "quadriceps", "shoulders", "traps", "triceps", "upper_back", "other"],
+                        "description": "Primary muscle group"
+                    },
                     "other_muscles": {
                         "type": "array",
                         "description": "Optional additional muscle groups",
                         "items": {
                             "type": "string",
-                            "description": "Muscle group name (e.g., Abdominals, Biceps, Chest, Triceps, Lats, Quadriceps, etc.)"
+                            "enum": ["abdominals", "abductors", "adductors", "biceps", "calves", "cardio", "chest", "forearms", "full_body", "glutes", "hamstrings", "lats", "lower_back", "neck", "quadriceps", "shoulders", "traps", "triceps", "upper_back", "other"]
                         }
                     }
                 },

@@ -50,7 +50,7 @@ pub(crate) fn tools() -> Vec<Tool> {
                                     "items": {
                                         "type": "object",
                                         "properties": {
-                                            "set_type": {"type": "string", "enum": ["Normal", "Warmup", "Dropset", "Failure"], "description": "Type of set"},
+                                            "set_type": {"type": "string", "enum": ["normal", "warmup", "dropset", "failure"], "description": "Type of set"},
                                             "weight_kg": {"type": "number", "description": "Weight in kg"},
                                             "reps": {"type": "number", "description": "Number of reps"},
                                             "rep_range": {
@@ -100,7 +100,7 @@ pub(crate) fn tools() -> Vec<Tool> {
                                     "items": {
                                         "type": "object",
                                         "properties": {
-                                            "set_type": {"type": "string", "enum": ["Normal", "Warmup", "Dropset", "Failure"], "description": "Type of set"},
+                                            "set_type": {"type": "string", "enum": ["normal", "warmup", "dropset", "failure"], "description": "Type of set"},
                                             "weight_kg": {"type": "number", "description": "Weight in kg"},
                                             "reps": {"type": "number", "description": "Number of reps"},
                                             "rep_range": {

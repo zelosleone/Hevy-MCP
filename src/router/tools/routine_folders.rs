@@ -31,8 +31,7 @@ pub(crate) fn tools() -> Vec<Tool> {
             json!({
                 "type": "object",
                 "properties": {
-                    "title": {"type": "string", "description": "Folder title"},
-                    "index": {"type": "number", "description": "Optional index for ordering"}
+                    "title": {"type": "string", "description": "Folder title"}
                 },
                 "required": ["title"]
             }),
