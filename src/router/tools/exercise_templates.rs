@@ -35,7 +35,14 @@ pub(crate) fn tools() -> Vec<Tool> {
                     "exercise_type": {"type": "string", "description": "Exercise type, for example weight_reps"},
                     "equipment_category": {"type": "string", "description": "Equipment category, for example barbell"},
                     "muscle_group": {"type": "string", "description": "Primary muscle group, for example chest"},
-                    "other_muscles": {"type": "array", "description": "Optional additional muscle groups"}
+                    "other_muscles": {
+                        "type": "array",
+                        "description": "Optional additional muscle groups",
+                        "items": {
+                            "type": "string",
+                            "description": "Muscle group name (e.g., Abdominals, Biceps, Chest, Triceps, Lats, Quadriceps, etc.)"
+                        }
+                    }
                 },
                 "required": ["title", "exercise_type", "equipment_category", "muscle_group"]
             }),
