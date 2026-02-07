@@ -1,20 +1,31 @@
 use std::net::SocketAddr;
 use std::sync::Arc;
 
-use axum::{Router, routing::post};
+use axum::{Router, routing::{delete, post}};
 use thiserror::Error;
 
 use crate::HevyRouter;
 
-mod stream;
+mod handler;
+mod session;
 
 pub async fn serve(router: HevyRouter, addr: SocketAddr) -> Result<(), HttpError> {
-    let state = stream::AppState {
+    let session_timeout_secs = std::env::var("HEVY_SESSION_TIMEOUT_SECS")
+        .ok()
+        .and_then(|s| s.parse().ok())
+        .unwrap_or(3600);
+
+    let session_manager = Arc::new(session::SessionManager::new(session_timeout_secs));
+    session_manager.clone().start_cleanup_task();
+
+    let state = handler::AppState {
         router: Arc::new(router),
+        session_manager,
     };
 
     let app = Router::new()
-        .route("/hevymcp", post(stream::mcp_stream))
+        .route("/hevymcp", post(handler::mcp_handler))
+        .route("/hevymcp", delete(handler::delete_session))
         .with_state(state);
 
     let listener = tokio::net::TcpListener::bind(addr)

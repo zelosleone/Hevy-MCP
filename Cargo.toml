@@ -1,6 +1,6 @@
 [package]
 name = "hevy-mcp-server"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2024"
 description = "MCP server for Hevy fitness API"
 license = "MIT"
@@ -22,10 +22,9 @@ serde_with = "3"
 axum = "0.7"
 bytes = "1"
 tokio-stream = "0.1"
-tokio-util = { version = "0.7", features = ["codec"] }
 tower-service = "0.3"
-futures-util = "0.3"
 dashmap = "6"
+uuid = { version = "1.7", features = ["v4", "fast-rng"] }
 
 [profile.release]
 lto = true
