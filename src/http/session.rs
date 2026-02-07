@@ -1,5 +1,4 @@
 use dashmap::DashMap;
-use serde_json::Value;
 use std::sync::Arc;
 use std::time::{Duration, SystemTime};
 use tokio::time::sleep;
@@ -9,20 +8,15 @@ use uuid::Uuid;
 pub struct SessionState {
     pub session_id: String,
     pub api_key: String,
-    pub client_capabilities: Value,
-    pub created_at: SystemTime,
     pub last_activity: SystemTime,
 }
 
 impl SessionState {
-    pub fn new(api_key: String, client_capabilities: Value) -> Self {
-        let now = SystemTime::now();
+    pub fn new(api_key: String) -> Self {
         Self {
             session_id: Uuid::new_v4().to_string(),
             api_key,
-            client_capabilities,
-            created_at: now,
-            last_activity: now,
+            last_activity: SystemTime::now(),
         }
     }
 
@@ -51,8 +45,8 @@ impl SessionManager {
         }
     }
 
-    pub fn new_session(&self, api_key: String, client_capabilities: Value) -> SessionState {
-        let session = SessionState::new(api_key, client_capabilities);
+    pub fn new_session(&self, api_key: String) -> SessionState {
+        let session = SessionState::new(api_key);
         let session_id = session.session_id.clone();
         self.sessions.insert(session_id.clone(), session.clone());
         session

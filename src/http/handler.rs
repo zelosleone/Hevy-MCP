@@ -140,16 +140,7 @@ async fn handle_initialize(
         }
     };
 
-    let client_capabilities = request
-        .params
-        .as_ref()
-        .and_then(|p| p.get("capabilities"))
-        .cloned()
-        .unwrap_or(serde_json::Value::Object(serde_json::Map::new()));
-
-    let session = state
-        .session_manager
-        .new_session(api_key, client_capabilities);
+    let session = state.session_manager.new_session(api_key);
 
     let request_router = RequestRouter::new(state.router.clone(), session.api_key.clone());
     let mut service = RouterService(request_router);
