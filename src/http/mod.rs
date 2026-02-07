@@ -23,9 +23,15 @@ pub async fn serve(router: HevyRouter, addr: SocketAddr) -> Result<(), HttpError
         session_manager,
     };
 
+    let path = match std::env::var("HEVY_MCP_PATH") {
+        Ok(p) if p.starts_with('/') => p,
+        Ok(p) => format!("/{p}"),
+        Err(_) => "/".to_string(),
+    };
+
     let app = Router::new()
-        .route("/", post(handler::mcp_handler))
-        .route("/", delete(handler::delete_session))
+        .route(&path, post(handler::mcp_handler))
+        .route(&path, delete(handler::delete_session))
         .with_state(state);
 
     let listener = tokio::net::TcpListener::bind(addr)
