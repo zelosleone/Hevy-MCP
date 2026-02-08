@@ -1,6 +1,7 @@
 use dashmap::DashMap;
 use std::sync::Arc;
 use std::time::{Duration, SystemTime};
+use tokio::spawn;
 use tokio::time::sleep;
 use uuid::Uuid;
 
@@ -76,7 +77,7 @@ impl SessionManager {
     }
 
     pub fn start_cleanup_task(self: Arc<Self>) {
-        tokio::spawn(async move {
+        spawn(async move {
             loop {
                 sleep(Duration::from_secs(60)).await;
                 self.cleanup_expired_sessions();

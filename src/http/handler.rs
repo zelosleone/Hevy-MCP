@@ -1,16 +1,17 @@
+use crate::HevyRouter;
 use crate::http::session::SessionManager;
 use crate::router::RequestRouter;
-use crate::HevyRouter;
-use axum::body::Body;
+use axum::body::{Body, to_bytes};
 use axum::extract::{Query, State};
-use axum::http::{header, HeaderMap, StatusCode};
+use axum::http::{HeaderMap, StatusCode, header};
 use axum::response::{IntoResponse, Response};
 use mcp_server::router::RouterService;
 use mcp_spec::protocol::{
     ErrorData, INTERNAL_ERROR, INVALID_REQUEST, JsonRpcError, JsonRpcMessage, JsonRpcNotification,
     JsonRpcRequest, JsonRpcResponse, PARSE_ERROR,
 };
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
+use serde_json::{from_slice, to_string};
 use std::sync::Arc;
 use tower_service::Service;
 
@@ -33,14 +34,17 @@ pub(crate) async fn mcp_handler(
     headers: HeaderMap,
     body: Body,
 ) -> Response {
-    let body_bytes = match axum::body::to_bytes(body, usize::MAX).await {
+    let body_bytes = match to_bytes(body, usize::MAX).await {
         Ok(bytes) => bytes,
         Err(err) => {
-            return error_response(INTERNAL_ERROR, format!("Failed to read request body: {}", err))
+            return error_response(
+                INTERNAL_ERROR,
+                format!("Failed to read request body: {}", err),
+            );
         }
     };
 
-    let message: JsonRpcMessage = match serde_json::from_slice(&body_bytes) {
+    let message: JsonRpcMessage = match from_slice(&body_bytes) {
         Ok(msg) => msg,
         Err(err) => return error_response(PARSE_ERROR, format!("Invalid JSON: {}", err)),
     };
@@ -51,13 +55,14 @@ pub(crate) async fn mcp_handler(
         .map(|s| s.to_string());
 
     match message {
-        JsonRpcMessage::Request(request) => {
-            handle_request(state, query, session_id, request).await
-        }
+        JsonRpcMessage::Request(request) => handle_request(state, query, session_id, request).await,
         JsonRpcMessage::Notification(notification) => {
             handle_notification(state, session_id, notification).await
         }
-        _ => error_response(INVALID_REQUEST, "Expected request or notification".to_string()),
+        _ => error_response(
+            INVALID_REQUEST,
+            "Expected request or notification".to_string(),
+        ),
     }
 }
 
@@ -77,7 +82,7 @@ async fn handle_request(
             return error_response(
                 INVALID_REQUEST,
                 "Missing Mcp-Session-Id header. Call initialize first.".to_string(),
-            )
+            );
         }
     };
 
@@ -92,7 +97,7 @@ async fn handle_request(
                     "Session not found or expired".to_string(),
                 )),
             )
-                .into_response()
+                .into_response();
         }
     };
 
@@ -122,11 +127,7 @@ async fn handle_request(
     json_response(response)
 }
 
-async fn handle_initialize(
-    state: AppState,
-    query: McpQuery,
-    request: JsonRpcRequest,
-) -> Response {
+async fn handle_initialize(state: AppState, query: McpQuery, request: JsonRpcRequest) -> Response {
     let api_key = match query
         .apikey
         .or_else(|| state.router.default_api_key.clone())
@@ -185,19 +186,16 @@ async fn handle_notification(
         return (StatusCode::ACCEPTED, "").into_response();
     }
 
-    if let Some(session_id) = session_id {
-        if state.session_manager.get_session(&session_id).is_some() {
-            state.session_manager.update_activity(&session_id);
-        }
+    if let Some(session_id) = session_id
+        && state.session_manager.get_session(&session_id).is_some()
+    {
+        state.session_manager.update_activity(&session_id);
     }
 
     (StatusCode::ACCEPTED, "").into_response()
 }
 
-pub(crate) async fn delete_session(
-    State(state): State<AppState>,
-    headers: HeaderMap,
-) -> Response {
+pub(crate) async fn delete_session(State(state): State<AppState>, headers: HeaderMap) -> Response {
     let session_id = match headers
         .get(MCP_SESSION_HEADER)
         .and_then(|v| v.to_str().ok())
@@ -208,7 +206,7 @@ pub(crate) async fn delete_session(
                 StatusCode::BAD_REQUEST,
                 "Missing Mcp-Session-Id header".to_string(),
             )
-                .into_response()
+                .into_response();
         }
     };
 
@@ -237,11 +235,7 @@ fn error_response(code: i32, message: String) -> Response {
         .into_response()
 }
 
-fn error_json(
-    id: Option<u64>,
-    code: i32,
-    message: String,
-) -> JsonRpcMessage {
+fn error_json(id: Option<u64>, code: i32, message: String) -> JsonRpcMessage {
     JsonRpcMessage::Error(JsonRpcError {
         jsonrpc: "2.0".to_string(),
         id,
@@ -253,6 +247,6 @@ fn error_json(
     })
 }
 
-fn json_body<T: serde::Serialize>(value: T) -> String {
-    serde_json::to_string(&value).unwrap_or_else(|_| "{}".to_string())
+fn json_body<T: Serialize>(value: T) -> String {
+    to_string(&value).unwrap_or_else(|_| "{}".to_string())
 }

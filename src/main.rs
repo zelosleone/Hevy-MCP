@@ -1,7 +1,9 @@
 use std::env;
+use std::io::stderr;
+use std::net::AddrParseError;
 
 use thiserror::Error;
-use tracing::Level;
+use tracing::{Level, info};
 use tracing_subscriber::FmtSubscriber;
 
 use hevy_mcp_server::{HevyRouter, http};
@@ -11,7 +13,7 @@ async fn main() -> Result<(), AppError> {
     FmtSubscriber::builder()
         .with_max_level(Level::INFO)
         .with_target(false)
-        .with_writer(std::io::stderr)
+        .with_writer(stderr)
         .init();
 
     let api_key = match env::var("HEVY_API_KEY") {
@@ -25,8 +27,8 @@ async fn main() -> Result<(), AppError> {
     };
 
     match &api_key {
-        Some(_) => tracing::info!("Running in single-user mode with default API key"),
-        None => tracing::info!("Running in multi-user mode - API key required per request"),
+        Some(_) => info!("Running in single-user mode with default API key"),
+        None => info!("Running in multi-user mode - API key required per request"),
     }
 
     let router = HevyRouter::new(api_key);
@@ -52,7 +54,7 @@ enum AppError {
     #[error("{0}")]
     EnvVar(String),
     #[error("HEVY_HTTP_ADDR must be a valid socket address: {0}")]
-    InvalidAddr(std::net::AddrParseError),
+    InvalidAddr(AddrParseError),
     #[error("HTTP server error: {0}")]
     HttpServe(String),
 }

@@ -1,8 +1,15 @@
+use std::env;
 use std::net::SocketAddr;
 use std::sync::Arc;
 
-use axum::{Router, routing::{delete, post}};
+use axum::{
+    Router,
+    routing::{delete, post},
+    serve as axum_serve,
+};
 use thiserror::Error;
+use tokio::net::TcpListener;
+use tracing::info;
 
 use crate::HevyRouter;
 
@@ -10,7 +17,7 @@ mod handler;
 mod session;
 
 pub async fn serve(router: HevyRouter, addr: SocketAddr) -> Result<(), HttpError> {
-    let session_timeout_secs = std::env::var("HEVY_SESSION_TIMEOUT_SECS")
+    let session_timeout_secs = env::var("HEVY_SESSION_TIMEOUT_SECS")
         .ok()
         .and_then(|s| s.parse().ok())
         .unwrap_or(3600);
@@ -23,7 +30,7 @@ pub async fn serve(router: HevyRouter, addr: SocketAddr) -> Result<(), HttpError
         session_manager,
     };
 
-    let path = match std::env::var("HEVY_MCP_PATH") {
+    let path = match env::var("HEVY_MCP_PATH") {
         Ok(p) if p.starts_with('/') => p,
         Ok(p) => format!("/{p}"),
         Err(_) => "/".to_string(),
@@ -34,11 +41,11 @@ pub async fn serve(router: HevyRouter, addr: SocketAddr) -> Result<(), HttpError
         .route(&path, delete(handler::delete_session))
         .with_state(state);
 
-    let listener = tokio::net::TcpListener::bind(addr)
+    let listener = TcpListener::bind(addr)
         .await
         .map_err(|err| HttpError::Bind(err.to_string()))?;
-    tracing::info!("HTTP MCP server listening on {}", addr);
-    axum::serve(listener, app)
+    info!("HTTP MCP server listening on {}", addr);
+    axum_serve(listener, app)
         .await
         .map_err(|err| HttpError::Serve(err.to_string()))?;
     Ok(())
