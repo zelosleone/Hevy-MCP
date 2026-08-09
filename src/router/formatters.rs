@@ -20,8 +20,9 @@ pub(crate) fn format_workout(workout: &Workout) -> String {
 
     for exercise in &workout.exercises {
         output.push_str(&format!(
-            "  {}. Exercise Template ID: {}\n",
+            "  {}. {} (Template ID: {})\n",
             exercise.index + 1,
+            exercise.title.as_deref().unwrap_or("Unknown exercise"),
             exercise.exercise_template_id
         ));
         if let Some(notes) = &exercise.notes {
@@ -62,8 +63,9 @@ pub(crate) fn format_routine(routine: &Routine) -> String {
 
     for exercise in &routine.exercises {
         output.push_str(&format!(
-            "  {}. Exercise Template ID: {}\n",
+            "  {}. {} (Template ID: {})\n",
             exercise.index + 1,
+            exercise.title.as_deref().unwrap_or("Unknown exercise"),
             exercise.exercise_template_id
         ));
         if let Some(notes) = &exercise.notes {

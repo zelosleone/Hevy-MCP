@@ -84,6 +84,8 @@ impl<'de> Deserialize<'de> for WorkoutResponse {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WorkoutExercise {
     pub index: u32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub title: Option<String>,
     #[serde(deserialize_with = "deserialize_string_id")]
     pub exercise_template_id: String,
     #[serde(skip_serializing_if = "Option::is_none")]
