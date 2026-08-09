@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use axum::{
     Router,
-    routing::{delete, post},
+    routing::{delete, get, post},
     serve as axum_serve,
 };
 use thiserror::Error;
@@ -39,6 +39,7 @@ pub async fn serve(router: HevyRouter, addr: SocketAddr) -> Result<(), HttpError
     let app = Router::new()
         .route(&path, post(handler::mcp_handler))
         .route(&path, delete(handler::delete_session))
+        .route("/favicon.ico", get(handler::favicon))
         .with_state(state);
 
     let listener = TcpListener::bind(addr)

@@ -3,6 +3,7 @@ FROM rust:1.93.0-bookworm AS builder
 WORKDIR /app
 COPY Cargo.toml Cargo.lock ./
 COPY src ./src
+COPY assets ./assets
 RUN cargo build --release
 
 FROM gcr.io/distroless/cc-debian12

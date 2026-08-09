@@ -17,6 +17,19 @@ use tower_service::Service;
 
 const MCP_SESSION_HEADER: &str = "Mcp-Session-Id";
 
+const FAVICON: &[u8] = include_bytes!("../../assets/favicon.ico");
+
+pub(crate) async fn favicon() -> Response {
+    (
+        [
+            (header::CONTENT_TYPE, "image/vnd.microsoft.icon"),
+            (header::CACHE_CONTROL, "public, max-age=86400"),
+        ],
+        FAVICON,
+    )
+        .into_response()
+}
+
 #[derive(Clone)]
 pub(crate) struct AppState {
     pub(crate) router: Arc<HevyRouter>,
