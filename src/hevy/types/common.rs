@@ -72,12 +72,14 @@ pub struct PaginatedResponse<T> {
 pub enum ExerciseType {
     WeightReps,
     RepsOnly,
-    BodyweightReps,
-    BodyweightAssistedReps,
+    BodyweightWeighted,
+    BodyweightAssisted,
     Duration,
     WeightDuration,
     DistanceDuration,
     ShortDistanceWeight,
+    FloorsDuration,
+    StepsDuration,
     Reps,
     Weight,
     #[serde(other)]

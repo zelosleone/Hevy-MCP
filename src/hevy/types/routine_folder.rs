@@ -18,6 +18,7 @@ pub struct RoutineFolder {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RoutineFoldersResponse {
+    #[serde(alias = "routines")]
     pub routine_folders: Vec<RoutineFolder>,
 }
 

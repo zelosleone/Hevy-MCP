@@ -63,9 +63,6 @@ pub(crate) fn format_workout(workout: &Workout) -> String {
     if let Some(desc) = &workout.description {
         output.push_str(&format!("Description: {}\n", desc));
     }
-    if workout.is_private {
-        output.push_str("Private: Yes\n");
-    }
     if let Some(updated) = &workout.updated_at {
         output.push_str(&format!("Updated: {}\n", updated));
     }
@@ -82,7 +79,9 @@ pub(crate) fn format_workout(workout: &Workout) -> String {
         if let Some(superset_id) = exercise.superset_id {
             output.push_str(&format!("     Superset: {}\n", superset_id));
         }
-        if let Some(notes) = &exercise.notes {
+        if let Some(notes) = &exercise.notes
+            && !notes.trim().is_empty()
+        {
             output.push_str(&format!("     Notes: {}\n", notes));
         }
         for set in &exercise.sets {
@@ -134,7 +133,9 @@ pub(crate) fn format_routine(routine: &Routine) -> String {
         if let Some(rest) = exercise.rest_seconds {
             output.push_str(&format!("     Rest: {}s\n", rest));
         }
-        if let Some(notes) = &exercise.notes {
+        if let Some(notes) = &exercise.notes
+            && !notes.trim().is_empty()
+        {
             output.push_str(&format!("     Notes: {}\n", notes));
         }
         output.push_str(&format!("     Sets ({}):\n", exercise.sets.len()));
@@ -211,4 +212,3 @@ pub(crate) fn format_folder(folder: &RoutineFolder) -> String {
 
     output
 }
-
