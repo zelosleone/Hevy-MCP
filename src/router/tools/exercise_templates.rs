@@ -34,7 +34,7 @@ pub(crate) fn tools() -> Vec<Tool> {
                     "title": {"type": "string", "description": "Exercise title"},
                     "exercise_type": {
                         "type": "string",
-                        "enum": ["weight_reps", "reps_only", "bodyweight_weighted", "bodyweight_assisted", "duration", "distance_duration", "short_distance_weight", "floors_duration", "steps_duration"],
+                        "enum": ["weight_reps", "reps_only", "bodyweight_reps", "bodyweight_assisted_reps", "duration", "weight_duration", "distance_duration", "short_distance_weight"],
                         "description": "Exercise type"
                     },
                     "equipment_category": {

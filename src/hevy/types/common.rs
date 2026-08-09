@@ -72,8 +72,12 @@ pub struct PaginatedResponse<T> {
 pub enum ExerciseType {
     WeightReps,
     RepsOnly,
+    // Returned by the API when reading templates.
     BodyweightWeighted,
     BodyweightAssisted,
+    // Accepted by the API when creating templates.
+    BodyweightReps,
+    BodyweightAssistedReps,
     Duration,
     WeightDuration,
     DistanceDuration,
