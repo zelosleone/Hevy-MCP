@@ -93,6 +93,15 @@ Mcp-Session-Id: <session-id>
 ### Exercise History
 - `get_exercise_history` -- Get workout history for an exercise template. Required: `exercise_template_id`. Optional: `start_date`, `end_date` (ISO 8601).
 
+### Body Measurements
+- `get_body_measurements` -- List body measurement entries with pagination. Params: `page`, `page_size` (max 10).
+- `get_body_measurement` -- Get the entry recorded on a date. Required: `date` (YYYY-MM-DD).
+- `create_body_measurement` -- Create an entry for a date. Required: `date`. Optional: any of `weight_kg`, `lean_mass_kg`, `fat_percent` and the circumference fields. Fails if an entry already exists for that date.
+- `update_body_measurement` -- Replace the entry for a date. Same fields as `create_body_measurement`. Omitted fields are cleared.
+
+### User
+- `get_user_info` -- Get the account info of the user the API key belongs to.
+
 ## From source
 
 ```bash

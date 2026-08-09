@@ -1,9 +1,11 @@
+mod body_measurement;
 mod common;
 mod extra;
 mod routine;
 mod routine_folder;
 mod workout;
 
+pub(crate) use body_measurement::{BodyMeasurementArgs, DateArgs};
 pub(crate) use common::{IdArgs, PaginationArgs, parse_args};
 pub(crate) use extra::{CreateExerciseTemplateArgs, ExerciseHistoryArgs, WorkoutEventsArgs};
 pub(crate) use routine::{CreateRoutineArgs, UpdateRoutineArgs};

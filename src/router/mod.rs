@@ -65,7 +65,8 @@ impl Router for RequestRouter {
     fn instructions(&self) -> String {
         "Hevy MCP Server - Interact with the Hevy fitness API. \
         Available operations include managing workouts, routines, \
-        exercise templates, and folders. Requires a valid Hevy API key."
+        exercise templates, folders, and body measurements. \
+        Requires a valid Hevy API key."
             .to_string()
     }
 
@@ -108,3 +109,4 @@ impl Router for RequestRouter {
         Box::pin(async { Err(PromptError::NotFound("No prompts available".into())) })
     }
 }
+

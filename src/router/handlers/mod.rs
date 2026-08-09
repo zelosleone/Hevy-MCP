@@ -8,13 +8,19 @@ use serde_json::Value;
 
 use crate::hevy::HevyClient;
 
+mod body_measurements;
 mod crud;
 mod exercise_history;
 mod routine_folders;
 mod routines;
 mod templates;
+mod user;
 mod workouts;
 
+use body_measurements::{
+    handle_create_body_measurement, handle_get_body_measurement, handle_get_body_measurements,
+    handle_update_body_measurement,
+};
 use exercise_history::handle_get_exercise_history;
 use routine_folders::{
     handle_create_routine_folder, handle_get_routine_folder, handle_get_routine_folders,
@@ -25,6 +31,7 @@ use routines::{
 use templates::{
     handle_create_exercise_template, handle_get_exercise_template, handle_get_exercise_templates,
 };
+use user::handle_get_user_info;
 use workouts::{
     handle_create_workout, handle_get_workout, handle_get_workout_events, handle_get_workouts,
     handle_get_workouts_count, handle_update_workout,
@@ -58,6 +65,15 @@ pub(crate) fn call_tool(
             "get_routine_folders" => handle_get_routine_folders(&client, &arguments).await,
             "get_routine_folder" => handle_get_routine_folder(&client, &arguments).await,
             "create_routine_folder" => handle_create_routine_folder(&client, &arguments).await,
+            "get_body_measurements" => handle_get_body_measurements(&client, &arguments).await,
+            "get_body_measurement" => handle_get_body_measurement(&client, &arguments).await,
+            "create_body_measurement" => {
+                handle_create_body_measurement(&client, &arguments).await
+            }
+            "update_body_measurement" => {
+                handle_update_body_measurement(&client, &arguments).await
+            }
+            "get_user_info" => handle_get_user_info(&client).await,
             _ => Err(NotFound(format!("Unknown tool: {}", tool_name))),
         };
 

@@ -71,10 +71,14 @@ pub struct PaginatedResponse<T> {
 #[serde(rename_all = "snake_case")]
 pub enum ExerciseType {
     WeightReps,
-    Reps,
+    RepsOnly,
+    BodyweightReps,
+    BodyweightAssistedReps,
     Duration,
     WeightDuration,
     DistanceDuration,
+    ShortDistanceWeight,
+    Reps,
     Weight,
     #[serde(other)]
     Unknown,
@@ -110,13 +114,17 @@ pub enum MuscleGroup {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum Equipment {
+    None,
     Barbell,
     Dumbbell,
+    Kettlebell,
     Machine,
+    Plate,
+    ResistanceBand,
+    Suspension,
     Cable,
     Bodyweight,
     Band,
-    Kettlebell,
     TrapBar,
     SmithMachine,
     Other,

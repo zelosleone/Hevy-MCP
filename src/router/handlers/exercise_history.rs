@@ -3,6 +3,7 @@ use serde_json::Value;
 
 use crate::hevy::HevyClient;
 use crate::router::args::{ExerciseHistoryArgs, parse_args};
+use crate::router::formatters::{SetMetrics, format_set_metrics};
 
 pub(crate) async fn handle_get_exercise_history(
     client: &HevyClient,
@@ -43,14 +44,16 @@ fn format_exercise_history_entry(entry: &crate::hevy::ExerciseHistoryEntry) -> S
         "Exercise Template ID: {}\n",
         entry.exercise_template_id
     ));
-    if let Some(weight) = entry.weight_kg {
-        output.push_str(&format!("Weight: {:.1}kg\n", weight));
-    }
-    if let Some(reps) = entry.reps {
-        output.push_str(&format!("Reps: {}\n", reps));
-    }
-    if let Some(rpe) = entry.rpe {
-        output.push_str(&format!("RPE: {}\n", rpe));
-    }
+    let metrics = format_set_metrics(&SetMetrics {
+        set_type: entry.set_type.as_ref(),
+        weight_kg: entry.weight_kg,
+        reps: entry.reps,
+        rep_range: None,
+        duration_seconds: entry.duration_seconds,
+        distance_meters: entry.distance_meters,
+        rpe: entry.rpe,
+        custom_metric: entry.custom_metric,
+    });
+    output.push_str(&format!("Set: {}\n", metrics));
     output
 }

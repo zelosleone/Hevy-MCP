@@ -14,6 +14,7 @@ pub struct ExerciseTemplate {
     #[serde(default)]
     pub secondary_muscle_groups: Vec<MuscleGroup>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(alias = "equipment_category")]
     pub equipment: Option<Equipment>,
     pub is_custom: bool,
 }

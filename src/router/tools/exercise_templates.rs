@@ -34,12 +34,12 @@ pub(crate) fn tools() -> Vec<Tool> {
                     "title": {"type": "string", "description": "Exercise title"},
                     "exercise_type": {
                         "type": "string",
-                        "enum": ["weight_reps", "reps", "duration", "weight_duration", "distance_duration", "weight"],
+                        "enum": ["weight_reps", "reps_only", "bodyweight_reps", "bodyweight_assisted_reps", "duration", "weight_duration", "distance_duration", "short_distance_weight"],
                         "description": "Exercise type"
                     },
                     "equipment_category": {
                         "type": "string",
-                        "enum": ["barbell", "dumbbell", "machine", "cable", "bodyweight", "band", "kettlebell", "trap_bar", "smith_machine", "other"],
+                        "enum": ["none", "barbell", "dumbbell", "kettlebell", "machine", "plate", "resistance_band", "suspension", "other"],
                         "description": "Equipment category"
                     },
                     "muscle_group": {
