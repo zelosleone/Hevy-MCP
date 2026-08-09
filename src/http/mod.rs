@@ -39,6 +39,7 @@ pub async fn serve(router: HevyRouter, addr: SocketAddr) -> Result<(), HttpError
     let app = Router::new()
         .route(&path, post(handler::mcp_handler))
         .route(&path, delete(handler::delete_session))
+        .route("/", get(handler::index))
         .route("/favicon.ico", get(handler::favicon))
         .with_state(state);
 

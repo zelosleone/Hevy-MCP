@@ -20,6 +20,8 @@ mod tools;
 use crate::router::handlers::call_tool;
 use crate::router::tools::list_tools;
 
+pub(crate) use crate::router::tools::annotate_tools;
+
 #[derive(Clone)]
 pub struct HevyRouter {
     client_cache: Arc<DashMap<String, Arc<HevyClient>>>,

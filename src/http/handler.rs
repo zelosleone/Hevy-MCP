@@ -1,6 +1,6 @@
 use crate::HevyRouter;
 use crate::http::session::SessionManager;
-use crate::router::RequestRouter;
+use crate::router::{RequestRouter, annotate_tools};
 use axum::body::{Body, to_bytes};
 use axum::extract::{Query, State};
 use axum::http::{HeaderMap, StatusCode, header};
@@ -18,6 +18,19 @@ use tower_service::Service;
 const MCP_SESSION_HEADER: &str = "Mcp-Session-Id";
 
 const FAVICON: &[u8] = include_bytes!("../../assets/favicon.ico");
+
+const INDEX_HTML: &str = concat!(
+    "<!doctype html><html><head><meta charset=\"utf-8\">",
+    "<link rel=\"icon\" href=\"/favicon.ico\" sizes=\"any\">",
+    "<title>Hevy MCP Server</title></head>",
+    "<body><h1>Hevy MCP Server</h1>",
+    "<p>Model Context Protocol endpoint. Connect an MCP client to this URL.</p>",
+    "</body></html>"
+);
+
+pub(crate) async fn index() -> Response {
+    ([(header::CONTENT_TYPE, "text/html; charset=utf-8")], INDEX_HTML).into_response()
+}
 
 pub(crate) async fn favicon() -> Response {
     (
@@ -120,7 +133,8 @@ async fn handle_request(
     let mut service = RouterService(request_router);
 
     let id = request.id;
-    let response = match service.call(request).await {
+    let method = request.method.clone();
+    let mut response = match service.call(request).await {
         Ok(response) => response,
         Err(err) => {
             let error_message = format!("{:?}", err);
@@ -136,6 +150,12 @@ async fn handle_request(
             }
         }
     };
+
+    if method == "tools/list"
+        && let Some(result) = response.result.as_mut()
+    {
+        annotate_tools(result);
+    }
 
     json_response(response)
 }
